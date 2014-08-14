@@ -6,7 +6,7 @@ public class Main extends Plugin {
 	
     @Override
     public void onEnable() {
-        getLogger().info("Basliyoruz :P");
+        getLogger().info("BungeeLejyon plugini aktif edildi!");
     }
     
 }
