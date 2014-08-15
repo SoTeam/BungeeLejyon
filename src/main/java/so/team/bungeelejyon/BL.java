@@ -49,7 +49,7 @@ public class BL extends Plugin implements Listener {
     public void pluginMessageEvent(PubSubMessageEvent event){
       if (event.getChannel().equals("BungeeLejyon")) {
         String[] mesaj = event.getMessage().split(split);
-        if (mesaj[0].equalsIgnoreCase("MesajGonder")) {
+        if (mesaj[0].equalsIgnoreCase("MesajGönder")) {
           if (ProxyServer.getInstance().getPlayer(mesaj[1]) != null) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(mesaj[1]);
             p.sendMessage(mesaj[2]);
