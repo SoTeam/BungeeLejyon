@@ -1,15 +1,22 @@
 package so.team.bungeelejyon;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import com.imaginarycode.minecraft.redisbungee.RedisBungeeAPI;
 import com.imaginarycode.minecraft.redisbungee.events.PubSubMessageEvent;
 
 import so.team.bungeelejyon.api.Mysql;
 import so.team.bungeelejyon.api.RedisAPI;
+import so.team.bungeelejyon.api.YmlAPI;
+import so.team.bungeelejyon.metotlar.MetotÇalýþtýr;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 
 public class BL extends Plugin implements Listener {
@@ -20,7 +27,9 @@ public class BL extends Plugin implements Listener {
 	public static String split = "######";
 	
 	//Classlar
-		public static Metotlar m;
+		public static MetotÇalýþtýr m;
+		public static YmlAPI ya;
+		public static Configuration getConfig;
 		public static Mysql ms;
 		public static RedisAPI ra;
 		public static RedisBungeeAPI rb;
@@ -31,17 +40,34 @@ public class BL extends Plugin implements Listener {
     	instance = this;
 		
 		//Classlar
-			m = new Metotlar();
-			ms = new Mysql();
+    		getConfig = new YmlAPI().config;
+    		ms = new Mysql();
+    		ya = new YmlAPI();
+			m = new MetotÇalýþtýr();
 			ra = new RedisAPI();
 			rb = RedisBungee.getApi();
 		//Classlar
 			
-		
-	    //ms.mysqlBaslangic();
+		ya.file = new File(BL.instance.getDataFolder(), "config.yml");
+		try {
+			getConfig = ya.provider.load(ya.file);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+			
+		ya.ymlOlustur();
+		ms.defaultConfigOlustur();
+	    try {
+			ms.mysqlBaslangic();
+			m.seviyeleriGüncelle();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 			  		  
 	    getProxy().getPluginManager().registerListener(this, this);
 	    rb.registerPubSubChannels("BungeeLejyon");
+	    
     }
     
     @SuppressWarnings("deprecation")
