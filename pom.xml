@@ -41,5 +41,10 @@
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+       		<groupId>com.imaginarycode.minecraft</groupId>
+ 			<artifactId>RedisBungee</artifactId>
+			<version>0.3.3-SNAPSHOT</version>
+	    </dependency>
 	</dependencies>
 </project>
