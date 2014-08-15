@@ -5,29 +5,34 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import so.team.bungeelejyon.BL;
+
 public class Mysql {
 		
-	public Connection baglanti = null;
+	public Connection baÄŸlantÄ± = null;
 	public Statement statement = null;
-		
-	
-	
-	public void mysqlBaslangic(){		
-		try {
-			String yol = "xxxx";
-	    	String port = "3306";
-	    	String kullaniciadi = "xxxx";
-	    	String sifre = "xxxx";
-	    	String tablo = "xxxx";
+
+	public void defaultConfigOlustur(){
+        if (BL.getConfig.get("Mysql.Adres") == null){
+        	BL.getConfig.set("Mysql.Adres", "localhost");
+        	BL.getConfig.set("Mysql.Port", "3306");
+        	BL.getConfig.set("Mysql.KullaniciAdi", "id");
+        	BL.getConfig.set("Mysql.Sifre", "sifre");
+        	BL.getConfig.set("Mysql.Database", "database");
+        	BL.ya.kaydet();
+        }
+	}
+	public void mysqlBaslangic() throws SQLException{		
+		String yol = BL.getConfig.getString("Mysql.Adres");
+	    String port = BL.getConfig.getString("Mysql.Port");
+	    String kullaniciadi = BL.getConfig.getString("Mysql.KullaniciAdi");
+	    String sifre = BL.getConfig.getString("Mysql.Sifre");
+	    String tablo = BL.getConfig.getString("Mysql.Database");
 	    	
-			baglanti = DriverManager.getConnection("jdbc:mysql://" + yol + ":" + port + "/" + tablo, kullaniciadi , sifre);
-			statement = baglanti.createStatement();
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Lejyonlar` (`LejyonAdý` varchar(64) NOT NULL,`AçýlmaTarihi` varchar(64) NOT NULL,`ToplamPuan` int(64),`AylýkPuan` int(64),`LejyonSeviyesi` int(64),`LejyonDurumu` varchar(64) NOT NULL,`LejyonuKuran` varchar(64) NOT NULL,`MOTD` varchar(255) NOT NULL) ENGINE=MyISAM DEFAULT CHARSET=UTF8;");
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Oyuncular` (`OyuncuAdý` varchar(64) NOT NULL,`Lejyon` varchar(64) NOT NULL,`Rütbe` varchar(64),`Bildirimler` int(64)) ENGINE=MyISAM DEFAULT CHARSET=UTF8;");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		baÄŸlantÄ± = DriverManager.getConnection("jdbc:mysql://" + yol + ":" + port + "/" + tablo, kullaniciadi , sifre);
+		statement = baÄŸlantÄ±.createStatement();
+		statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Lejyonlar` (`LejyonAdi` varchar(64) NOT NULL,`OlusturmaTarihi` varchar(64) NOT NULL,`ToplamPuan` int(64),`AylikPuan` int(64),`LejyonSeviyesi` int(64),`LejyonDurumu` varchar(64) NOT NULL,`LejyonuKuran` varchar(64) NOT NULL,`MOTD` varchar(255) NOT NULL);");
+		statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Oyuncular` (`OyuncuAdi` varchar(64) NOT NULL,`Lejyon` varchar(64) NOT NULL,`Rutbe` varchar(64),`Bildirimler` int(64));");
 	}
 
 }
