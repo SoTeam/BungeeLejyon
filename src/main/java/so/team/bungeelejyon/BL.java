@@ -8,10 +8,12 @@ import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import com.imaginarycode.minecraft.redisbungee.RedisBungeeAPI;
 import com.imaginarycode.minecraft.redisbungee.events.PubSubMessageEvent;
 
+import so.team.bungeelejyon.api.LejyonAPI;
 import so.team.bungeelejyon.api.Mysql;
 import so.team.bungeelejyon.api.RedisAPI;
 import so.team.bungeelejyon.api.YmlAPI;
-import so.team.bungeelejyon.metotlar.MetotÇalýþtýr;
+import so.team.bungeelejyon.komutlar.l;
+import so.team.bungeelejyon.metotlar.MetotÃ‡alÄ±ÅŸtÄ±r;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
@@ -22,16 +24,17 @@ import net.md_5.bungee.event.EventHandler;
 public class BL extends Plugin implements Listener {
 	
 	public static BL instance;
-	public static String prefix = "§8[§aSo-Lejyon§8]§r ";
+	public static String prefix = "ï¿½8[ï¿½aSo-Lejyonï¿½8]ï¿½r ";
 	
 	public static String split = "######";
 	
 	//Classlar
-		public static MetotÇalýþtýr m;
+		public static MetotÃ‡alÄ±ÅŸtÄ±r m;
 		public static YmlAPI ya;
 		public static Configuration getConfig;
 		public static Mysql ms;
 		public static RedisAPI ra;
+		public static LejyonAPI la;
 		public static RedisBungeeAPI rb;
 	//Classlar
 	
@@ -43,8 +46,9 @@ public class BL extends Plugin implements Listener {
     		getConfig = new YmlAPI().config;
     		ms = new Mysql();
     		ya = new YmlAPI();
-			m = new MetotÇalýþtýr();
+			m = new MetotÃ‡alÄ±ÅŸtÄ±r();
 			ra = new RedisAPI();
+			la = new LejyonAPI();
 			rb = RedisBungee.getApi();
 		//Classlar
 			
@@ -60,12 +64,14 @@ public class BL extends Plugin implements Listener {
 		ms.defaultConfigOlustur();
 	    try {
 			ms.mysqlBaslangic();
-			m.seviyeleriGüncelle();
+			la.bilgileriYukle();
+			m.seviyeleriGÃ¼ncelle();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 			  		  
 	    getProxy().getPluginManager().registerListener(this, this);
+	    ProxyServer.getInstance().getPluginManager().registerCommand(this, new l(this));
 	    rb.registerPubSubChannels("BungeeLejyon");
 	    
     }
@@ -75,7 +81,7 @@ public class BL extends Plugin implements Listener {
     public void pluginMessageEvent(PubSubMessageEvent event){
       if (event.getChannel().equals("BungeeLejyon")) {
         String[] mesaj = event.getMessage().split(split);
-        if (mesaj[0].equalsIgnoreCase("MesajGönder")) {
+        if (mesaj[0].equalsIgnoreCase("MesajGÃ¶nder")) {
           if (ProxyServer.getInstance().getPlayer(mesaj[1]) != null) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(mesaj[1]);
             p.sendMessage(mesaj[2]);

@@ -2,25 +2,22 @@ package so.team.bungeelejyon.metotlar;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map.Entry;
 
 import so.team.bungeelejyon.BL;
 
 public class SeviyeGüncelle{
-	HashMap<String,Integer> lejyonPuanları = new HashMap<String,Integer>();
-	HashMap<String,Integer> lejyonSeviyeleri = new HashMap<String,Integer>();
 	
 	public void güncelle() throws SQLException
 	{
-		lejyonPuanları.clear();
-		lejyonSeviyeleri.clear();
+		BL.la.ToplamPuan.clear();
+		BL.la.LejyonSeviyesi.clear();
 		ResultSet res = BL.ms.statement.executeQuery("SELECT LejyonAdi,ToplamPuan FROM Lejyonlar ORDER BY ToplamPuan DESC;");
 		while (res.next()){
-			lejyonPuanları.put(res.getString("LejyonAdı"), res.getInt("ToplamPuan"));
+			BL.la.ToplamPuan.put(res.getString("LejyonAdı"), res.getInt("ToplamPuan"));
 		}
-		for (Entry<String, Integer> entry : lejyonPuanları.entrySet()){
-			lejyonSeviyeleri.put(entry.getKey(), seviyeyiHesapla(entry.getValue()));
+		for (Entry<String, Integer> entry : BL.la.ToplamPuan.entrySet()){
+			BL.la.LejyonSeviyesi.put(entry.getKey(), seviyeyiHesapla(entry.getValue()));
 		}
 		
 		seviyeleriAta();
@@ -28,8 +25,8 @@ public class SeviyeGüncelle{
 	}
 	
 	private void seviyeleriAta() throws SQLException{
-		for (Entry<String, Integer> entry : lejyonPuanları.entrySet()){
-			BL.ms.statement.executeUpdate("UPDATE Lejyonlar SET LejyonSeviyesi="+ entry.getValue() +" WHERE LejyonAdı='"+ entry.getKey()+"'");
+		for (Entry<String, Integer> entry : BL.la.ToplamPuan.entrySet()){
+			BL.ms.statement.executeUpdate("UPDATE Lejyonlar SET LejyonSeviyesi="+ entry.getValue() +" WHERE LejyonAdi='"+ entry.getKey()+"'");
 		}
 	}
 
