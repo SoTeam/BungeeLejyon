@@ -9,7 +9,7 @@ public class ServerDeðiþtiðinde implements Listener {
 		
 	 @SuppressWarnings("deprecation")
 	 @EventHandler
-	  public void LobiyeGirdiðinde(ServerSwitchEvent e)
+	 public void LobiyeGirdiðinde(ServerSwitchEvent e)
 	  {
 		 if (OyunaGirdiðinde.oyunaGirenLejyonÜyeleri.contains(e.getPlayer()))
 		 {
