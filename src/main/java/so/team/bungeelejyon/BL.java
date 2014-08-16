@@ -8,10 +8,14 @@ import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import com.imaginarycode.minecraft.redisbungee.RedisBungeeAPI;
 import com.imaginarycode.minecraft.redisbungee.events.PubSubMessageEvent;
 
+import so.team.bungeelejyon.api.LejyonAPI;
 import so.team.bungeelejyon.api.Mysql;
 import so.team.bungeelejyon.api.RedisAPI;
 import so.team.bungeelejyon.api.YmlAPI;
-import so.team.bungeelejyon.metotlar.Metot�al��t�r;
+import so.team.bungeelejyon.event.OyunaGirdiğinde;
+import so.team.bungeelejyon.event.ServerDeğiştiğinde;
+import so.team.bungeelejyon.komutlar.l;
+import so.team.bungeelejyon.metotlar.MetotÇalıştır;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
@@ -22,16 +26,17 @@ import net.md_5.bungee.event.EventHandler;
 public class BL extends Plugin implements Listener {
 	
 	public static BL instance;
-	public static String prefix = "�8[�aSo-Lejyon�8]�r ";
+	public static String prefix = "§8[§aSo-Lejyon§8]§r ";
 	
 	public static String split = "######";
 	
 	//Classlar
-		public static Metot�al��t�r m;
+		public static MetotÇalıştır m;
 		public static YmlAPI ya;
 		public static Configuration getConfig;
 		public static Mysql ms;
 		public static RedisAPI ra;
+		public static LejyonAPI la;
 		public static RedisBungeeAPI rb;
 	//Classlar
 	
@@ -43,8 +48,9 @@ public class BL extends Plugin implements Listener {
     		getConfig = new YmlAPI().config;
     		ms = new Mysql();
     		ya = new YmlAPI();
-			m = new Metot�al��t�r();
+			m = new MetotÇalıştır();
 			ra = new RedisAPI();
+			la = new LejyonAPI();
 			rb = RedisBungee.getApi();
 		//Classlar
 			
@@ -60,12 +66,19 @@ public class BL extends Plugin implements Listener {
 		ms.defaultConfigOlustur();
 	    try {
 			ms.mysqlBaslangic();
-			m.seviyeleriG�ncelle();
+			la.bilgileriYukle();
+			m.seviyeleriGüncelle();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-			  		  
-	    getProxy().getPluginManager().registerListener(this, this);
+	    
+	    //Dinleyiciler
+	    	getProxy().getPluginManager().registerListener(this, this);
+	    	getProxy().getPluginManager().registerListener(this, new OyunaGirdiğinde());
+	    	getProxy().getPluginManager().registerListener(this, new ServerDeğiştiğinde());
+	    //Dinleyiciler
+	    	
+	    ProxyServer.getInstance().getPluginManager().registerCommand(this, new l(this));
 	    rb.registerPubSubChannels("BungeeLejyon");
 	    
     }
@@ -75,12 +88,36 @@ public class BL extends Plugin implements Listener {
     public void pluginMessageEvent(PubSubMessageEvent event){
       if (event.getChannel().equals("BungeeLejyon")) {
         String[] mesaj = event.getMessage().split(split);
-        if (mesaj[0].equalsIgnoreCase("MesajG�nder")) {
+        if (mesaj[0].equalsIgnoreCase("MesajGönder")) {
           if (ProxyServer.getInstance().getPlayer(mesaj[1]) != null) {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(mesaj[1]);
             p.sendMessage(mesaj[2]);
           }
-        } 
+        } else if (mesaj[0].equalsIgnoreCase("LejyonaEkle")) {
+        	String lejyonaAlinan = mesaj[1];
+        	String lejyon = mesaj[2];
+        	
+        	la.OyuncuLejyonu.put(lejyonaAlinan, lejyon);
+        	if (getProxy().getPlayer(lejyonaAlinan) != null){
+        		getProxy().getPlayer(lejyonaAlinan).sendMessage(lejyon + " Lejyonuna alındın.");
+        	}
+        } else if (mesaj[0].equalsIgnoreCase("LejyondanSil")) {
+        	String lejyondanAtılan = mesaj[1];
+        	String lejyon = mesaj[2];
+        	
+        	if (la.OyuncuLejyonu.containsKey(lejyondanAtılan)){
+        		la.OyuncuLejyonu.remove(lejyondanAtılan);
+        	}
+        	if (la.OyuncuBildirimi.containsKey(lejyondanAtılan)){
+        		la.OyuncuBildirimi.remove(lejyondanAtılan);
+        	}
+        	if (la.OyuncuRütbesi.containsKey(lejyondanAtılan)){
+        		la.OyuncuRütbesi.remove(lejyondanAtılan);
+        	}
+        	if (getProxy().getPlayer(lejyondanAtılan) != null){
+        		getProxy().getPlayer(lejyondanAtılan).sendMessage(lejyon + " Lejyonundan atıldın.");
+        	}
+        }
       }
     }
     

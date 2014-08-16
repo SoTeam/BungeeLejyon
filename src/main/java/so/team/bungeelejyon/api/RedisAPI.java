@@ -17,7 +17,7 @@ public class RedisAPI {
 	
 
 	  public void mesajGönder(String mesajiAlan, String mesaj){
-		  BL.rb.sendChannelMessage("BungeeLejyon", "MesajGonder" + BL.split + mesajiAlan + BL.split + mesaj);
+		  BL.rb.sendChannelMessage("BungeeLejyon", "MesajGönder" + BL.split + mesajiAlan + BL.split + mesaj);
 	  }
 
 }
