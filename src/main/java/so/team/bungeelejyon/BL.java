@@ -24,7 +24,7 @@ import net.md_5.bungee.event.EventHandler;
 public class BL extends Plugin implements Listener {
 	
 	public static BL instance;
-	public static String prefix = "�8[�aSo-Lejyon�8]�r ";
+	public static String prefix = "§8[§aSo-Lejyon§8]§r ";
 	
 	public static String split = "######";
 	
@@ -86,7 +86,31 @@ public class BL extends Plugin implements Listener {
             ProxiedPlayer p = ProxyServer.getInstance().getPlayer(mesaj[1]);
             p.sendMessage(mesaj[2]);
           }
-        } 
+        } else if (mesaj[0].equalsIgnoreCase("LejyonaEkle")) {
+        	String lejyonaAlinan = mesaj[1];
+        	String lejyon = mesaj[2];
+        	
+        	la.OyuncuLejyonu.put(lejyonaAlinan, lejyon);
+        	if (getProxy().getPlayer(lejyonaAlinan) != null){
+        		getProxy().getPlayer(lejyonaAlinan).sendMessage(lejyon + " Lejyonuna alındın.");
+        	}
+        } else if (mesaj[0].equalsIgnoreCase("LejyondanSil")) {
+        	String lejyondanAtılan = mesaj[1];
+        	String lejyon = mesaj[2];
+        	
+        	if (la.OyuncuLejyonu.containsKey(lejyondanAtılan)){
+        		la.OyuncuLejyonu.remove(lejyondanAtılan);
+        	}
+        	if (la.OyuncuBildirimi.containsKey(lejyondanAtılan)){
+        		la.OyuncuBildirimi.remove(lejyondanAtılan);
+        	}
+        	if (la.OyuncuRütbesi.containsKey(lejyondanAtılan)){
+        		la.OyuncuRütbesi.remove(lejyondanAtılan);
+        	}
+        	if (getProxy().getPlayer(lejyondanAtılan) != null){
+        		getProxy().getPlayer(lejyondanAtılan).sendMessage(lejyon + " Lejyonundan atıldın.");
+        	}
+        }
       }
     }
     

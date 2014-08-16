@@ -38,7 +38,7 @@ public class l extends Command{
 		ArrayList<String> lejyonOyuncuListesi = BL.la.cekLejyonOyunculari(BL.la.cekOyuncuLejyonu(sender.getName()));
 		
 		for (String oyuncu : lejyonOyuncuListesi){
-			if (BL.ra.EgerOnline(oyuncu)){
+			if (BL.ra.EgerOnline(oyuncu) == true){
 				BL.ra.mesajGönder(oyuncu, sender.getName() + ": " + sb.toString());
 			}
 		}
