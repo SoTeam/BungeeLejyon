@@ -98,12 +98,13 @@ public class BL extends Plugin implements Listener {
         	String lejyon = mesaj[2];
         	
         	la.OyuncuLejyonu.put(lejyonaAlinan, lejyon);
-        	if (getProxy().getPlayer(lejyonaAlinan) != null){
-        		getProxy().getPlayer(lejyonaAlinan).sendMessage(lejyon + " Lejyonuna alındın.");
-        	}
+        } else if (mesaj[0].equalsIgnoreCase("LejyonisteğiGönder")) {
+        	String istekGönderilen = mesaj[1];
+        	String lejyon = mesaj[2];
+        	
+        	la.AktifLejyonTeklifleri.put(istekGönderilen, lejyon);
         } else if (mesaj[0].equalsIgnoreCase("LejyondanSil")) {
         	String lejyondanAtılan = mesaj[1];
-        	String lejyon = mesaj[2];
         	
         	if (la.OyuncuLejyonu.containsKey(lejyondanAtılan)){
         		la.OyuncuLejyonu.remove(lejyondanAtılan);
@@ -113,9 +114,6 @@ public class BL extends Plugin implements Listener {
         	}
         	if (la.OyuncuRütbesi.containsKey(lejyondanAtılan)){
         		la.OyuncuRütbesi.remove(lejyondanAtılan);
-        	}
-        	if (getProxy().getPlayer(lejyondanAtılan) != null){
-        		getProxy().getPlayer(lejyondanAtılan).sendMessage(lejyon + " Lejyonundan atıldın.");
         	}
         }
       }

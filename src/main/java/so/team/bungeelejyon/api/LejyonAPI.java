@@ -5,17 +5,22 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import so.team.bungeelejyon.BL;
 
 public class LejyonAPI {
+	
+	public HashMap<String,String> AktifLejyonTeklifleri = new HashMap<String,String>();
 	
 	//Lejyonlar DBsi
 		public HashMap<String,Integer> ToplamPuan = new HashMap<String,Integer>();
 		public HashMap<String,Integer> AylikPuan = new HashMap<String,Integer>();
 		public HashMap<String,Integer> LejyonSeviyesi = new HashMap<String,Integer>();
 		public HashMap<String,Integer> LejyonDurumu = new HashMap<String,Integer>();
+		public HashMap<String,Integer> LejyonuKuran = new HashMap<String,Integer>();
 		public HashMap<String,String> MOTD = new HashMap<String,String>();
 	
 	//Oyuncular DBsi
@@ -28,10 +33,11 @@ public class LejyonAPI {
 		AylikPuan.clear();
 		LejyonSeviyesi.clear();
 		LejyonDurumu.clear();
+		LejyonuKuran.clear();
+		MOTD.clear();
 		
 		OyuncuLejyonu.clear();
 		OyuncuRütbesi.clear();
-		OyuncuBildirimi.clear();
 		
 		ResultSet lejyonlar = BL.ms.statement.executeQuery("SELECT * FROM Lejyonlar;");
 		
@@ -40,13 +46,15 @@ public class LejyonAPI {
 			AylikPuan.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getInt("AylikPuan"));
 			LejyonSeviyesi.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getInt("LejyonSeviyesi"));
 			LejyonDurumu.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getInt("LejyonDurumu"));
-			MOTD.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getString("MOTD"));
+			LejyonuKuran.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getInt("LejyonuKuran"));
+			if (lejyonlar.getString("MOTD") != null){
+				MOTD.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getString("MOTD"));
+			}
 		}
 		ResultSet Oyuncular = BL.ms.statement.executeQuery("SELECT * FROM Oyuncular;");
 		while (Oyuncular.next()){
 			OyuncuLejyonu.put(Oyuncular.getString("OyuncuAdi"), Oyuncular.getString("Lejyon"));
 			OyuncuRütbesi.put(Oyuncular.getString("OyuncuAdi"), Oyuncular.getString("Rutbe"));
-			OyuncuBildirimi.put(Oyuncular.getString("OyuncuAdi"), Oyuncular.getInt("Bildirimler"));
 		}
 	}
 	
@@ -72,28 +80,59 @@ public class LejyonAPI {
 		return oyuncuListesi;
 	}
 	
-	@SuppressWarnings("deprecation")
-	public void lejyonaEkle(String oyuncu,String Lejyon,ProxiedPlayer sender) throws SQLException{
-		ResultSet res = BL.ms.statement.executeQuery("SELECT OyuncuAdi,Lejyon FROM Oyuncular WHERE OyuncuAdi = '" + oyuncu + "';");
-		res.next();
-		if (res.getRow() < 1){
-			BL.ms.statement.executeUpdate("INSERT INTO Oyuncular (`OyuncuAdi`,`Lejyon`) VALUES ('" + oyuncu + "','" + Lejyon + "');");
-			BL.rb.sendChannelMessage("BungeeLejyon", "LejyonaEkle" + BL.split + oyuncu + BL.split + Lejyon);
-			sender.sendMessage("Oyuncu baþarýyla lejyona eklendi.");
-		} else {
-			if (res.getString("Lejyon").equals(Lejyon)){
-				sender.sendMessage("Oyuncu zaten senin lejyonunda.");
-			} else {
-				sender.sendMessage("Oyuncu zaten baþka bir lejyonda.");
+	public void lejyonaEkle(String oyuncu,String Lejyon) throws SQLException{
+		BL.ms.statement.executeUpdate("INSERT INTO Oyuncular (`OyuncuAdi`,`Lejyon`,`Rutbe`) VALUES ('" + oyuncu + "','" + Lejyon + "','Lejyoner');");
+		BL.rb.sendChannelMessage("BungeeLejyon", "LejyonaEkle" + BL.split + oyuncu + BL.split + Lejyon);
+		BL.ra.mesajGönder(oyuncu, Lejyon + " Lejyonuna katýldýn.");
+		
+		ArrayList<String> lejyonOyuncuListesi = BL.la.cekLejyonOyunculari(Lejyon);
+		for (String lejyoner : lejyonOyuncuListesi){
+			if (BL.ra.EgerOnline(lejyoner) == true && !lejyoner.contains(oyuncu)){
+				BL.ra.mesajGönder(lejyoner, oyuncu + " lejyona katýldý.");
 			}
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
-	public void lejyondanSil(String oyuncu,String Lejyon,ProxiedPlayer sender) throws SQLException{
+	public void lejyonisteðiGönder(final String oyuncu,String Lejyon,final ProxiedPlayer sender){
+		BL.ra.mesajGönder(oyuncu, Lejyon + " isimli lejyona davet edildiniz.");
+		BL.ra.mesajGönder(oyuncu, "Onaylamak için /lejyon kabul komutunu girin. Reddetmek için /lejyon ret komutunu girin.");
+		BL.ra.mesajGönder(oyuncu, "Lejyon davetini 1 dakika içinde onaylamazsanýz, otomatik olarak istek iptal olacak.");
+		
+		BL.rb.sendChannelMessage("BungeeLejyon", "LejyonisteðiGönder" + BL.split + oyuncu + BL.split + Lejyon);
+		
+		ProxyServer.getInstance().getScheduler().schedule(BL.instance,new Runnable(){
+	        @SuppressWarnings("deprecation")
+			public void run(){
+	        	if (BL.la.AktifLejyonTeklifleri.containsKey(oyuncu)){
+	        		BL.la.AktifLejyonTeklifleri.remove(oyuncu);
+	        		BL.ra.mesajGönder(oyuncu, "Lejyon isteðini cevaplamadýðýnýz için, otomatik olarak reddedilmiþtir.");
+	        		sender.sendMessage(oyuncu + " Lejyon isteðine cevap vermediði için, otomatik olarak reddedildi.");
+	        	}
+	        }
+	      } , 30, TimeUnit.SECONDS);		
+	}
+	
+	public boolean lejyonaSahipmi(String oyuncu){
+		if (OyuncuLejyonu.containsKey(oyuncu)){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public void lejyondanSil(String oyuncu,String Lejyon) throws SQLException{
 		BL.ms.statement.executeUpdate("DELETE FROM `Oyuncular` WHERE (`OyuncuAdi`='" + oyuncu + "');");
-		BL.rb.sendChannelMessage("BungeeLejyon", "LejyondanSil" + BL.split + oyuncu + BL.split + Lejyon);
-		sender.sendMessage("Baþarýyla kiþiyi lejyondan çýkardýnýz.");
+		BL.rb.sendChannelMessage("BungeeLejyon", "LejyondanSil" + BL.split + oyuncu);
+		if (BL.ra.EgerOnline(oyuncu)){
+			BL.ra.mesajGönder(oyuncu, Lejyon + " lejyonundan atýldýn.");
+		}
+		
+		ArrayList<String> lejyonOyuncuListesi = BL.la.cekLejyonOyunculari(Lejyon);
+		for (String lejyoner : lejyonOyuncuListesi){
+			if (BL.ra.EgerOnline(lejyoner) == true && !lejyoner.contains(oyuncu)){
+				BL.ra.mesajGönder(lejyoner, oyuncu + " lejyondan atýldý.");
+			}
+		}
 	}
 
 }

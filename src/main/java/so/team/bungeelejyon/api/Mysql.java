@@ -31,8 +31,8 @@ public class Mysql {
 	    	
 		bağlantı = DriverManager.getConnection("jdbc:mysql://" + yol + ":" + port + "/" + tablo, kullaniciadi , sifre);
 		statement = bağlantı.createStatement();
-		statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Lejyonlar` (`LejyonAdi` varchar(64) NOT NULL,`OlusturmaTarihi` varchar(64) NOT NULL,`ToplamPuan` int(64),`AylikPuan` int(64),`LejyonSeviyesi` int(64),`LejyonDurumu` varchar(64) NOT NULL,`LejyonuKuran` varchar(64) NOT NULL,`MOTD` varchar(255) NOT NULL);");
-		statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Oyuncular` (`OyuncuAdi` varchar(64) NOT NULL,`Lejyon` varchar(64) NOT NULL,`Rutbe` varchar(64),`Bildirimler` int(64));");
+		statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Lejyonlar` (`LejyonAdi` varchar(64) NOT NULL,`SonFaturaTarihi` varchar(64) NOT NULL,`ToplamPuan` int(64),`AylikPuan` int(64),`LejyonSeviyesi` int(64),`LejyonDurumu` varchar(64) NOT NULL,`LejyonuKuran` varchar(64) NOT NULL,`MOTD` varchar(255));");
+		statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Oyuncular` (`OyuncuAdi` varchar(64) NOT NULL,`Lejyon` varchar(64) NOT NULL,`Rutbe` varchar(64));");
 	}
 
 }

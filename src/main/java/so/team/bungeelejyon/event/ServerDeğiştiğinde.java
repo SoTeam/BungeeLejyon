@@ -17,7 +17,9 @@ public class ServerDeðiþtiðinde implements Listener {
 			 {
 				 OyunaGirdiðinde.oyunaGirenLejyonÜyeleri.remove(OyunaGirdiðinde.oyunaGirenLejyonÜyeleri.indexOf(e.getPlayer()));
 				 String lejyonAdý = BL.la.OyuncuLejyonu.get(e.getPlayer().getName());
-				 e.getPlayer().sendMessage(BL.prefix + BL.la.MOTD.get(lejyonAdý));
+				 if (BL.la.MOTD.containsKey(lejyonAdý)){
+					 e.getPlayer().sendMessage(BL.prefix + BL.la.MOTD.get(lejyonAdý));
+				 }
 			 }
 		 }
 	  }
