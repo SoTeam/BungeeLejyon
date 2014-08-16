@@ -12,6 +12,8 @@ import so.team.bungeelejyon.api.LejyonAPI;
 import so.team.bungeelejyon.api.Mysql;
 import so.team.bungeelejyon.api.RedisAPI;
 import so.team.bungeelejyon.api.YmlAPI;
+import so.team.bungeelejyon.event.OyunaGirdiğinde;
+import so.team.bungeelejyon.event.ServerDeğiştiğinde;
 import so.team.bungeelejyon.komutlar.l;
 import so.team.bungeelejyon.metotlar.MetotÇalıştır;
 import net.md_5.bungee.api.ProxyServer;
@@ -69,8 +71,13 @@ public class BL extends Plugin implements Listener {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-			  		  
-	    getProxy().getPluginManager().registerListener(this, this);
+	    
+	    //Dinleyiciler
+	    	getProxy().getPluginManager().registerListener(this, this);
+	    	getProxy().getPluginManager().registerListener(this, new OyunaGirdiğinde());
+	    	getProxy().getPluginManager().registerListener(this, new ServerDeğiştiğinde());
+	    //Dinleyiciler
+	    	
 	    ProxyServer.getInstance().getPluginManager().registerCommand(this, new l(this));
 	    rb.registerPubSubChannels("BungeeLejyon");
 	    
