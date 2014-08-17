@@ -29,10 +29,10 @@ public class Mysql {
 	    String sifre = BL.getConfig.getString("Mysql.Sifre");
 	    String tablo = BL.getConfig.getString("Mysql.Database");
 	    	
-		bağlantı = DriverManager.getConnection("jdbc:mysql://" + yol + ":" + port + "/" + tablo, kullaniciadi , sifre);
+		bağlantı = DriverManager.getConnection("jdbc:mysql://" + yol + ":" + port + "/" + tablo + "?useUnicode=true&characterEncoding=UTF-8", kullaniciadi , sifre);
 		statement = bağlantı.createStatement();
-		statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Lejyonlar` (`LejyonAdi` varchar(64) NOT NULL,`SonFaturaTarihi` varchar(64) NOT NULL,`ToplamPuan` int(64),`AylikPuan` int(64),`LejyonSeviyesi` int(64),`LejyonDurumu` varchar(64) NOT NULL,`LejyonuKuran` varchar(64) NOT NULL,`MOTD` varchar(255));");
-		statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Oyuncular` (`OyuncuAdi` varchar(64) NOT NULL,`Lejyon` varchar(64) NOT NULL,`Rutbe` varchar(64));");
+		statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Lejyonlar` (`LejyonAdi` varchar(64) NOT NULL,`SonFaturaTarihi` varchar(64) NOT NULL,`ToplamPuan` int(64),`AylikPuan` int(64),`LejyonSeviyesi` int(64),`LejyonuKuran` varchar(64) NOT NULL,`MOTD` varchar(255)) ENGINE=MyISAM DEFAULT CHARSET=UTF8;");
+		statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Oyuncular` (`OyuncuAdi` varchar(64) NOT NULL,`Lejyon` varchar(64) NOT NULL,`Rutbe` varchar(64)) ENGINE=MyISAM DEFAULT CHARSET=UTF8;");
 	}
 
 }

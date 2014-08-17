@@ -3,36 +3,37 @@ package so.team.bungeelejyon.api;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 import so.team.bungeelejyon.BL;
 
 public class LejyonAPI {
 	
 	public HashMap<String,String> AktifLejyonTeklifleri = new HashMap<String,String>();
+
+	public HashMap<String,ScheduledTask> LejyonTeklifTasklari = new HashMap<String,ScheduledTask>();
 	
 	//Lejyonlar DBsi
 		public HashMap<String,Integer> ToplamPuan = new HashMap<String,Integer>();
 		public HashMap<String,Integer> AylikPuan = new HashMap<String,Integer>();
 		public HashMap<String,Integer> LejyonSeviyesi = new HashMap<String,Integer>();
-		public HashMap<String,Integer> LejyonDurumu = new HashMap<String,Integer>();
-		public HashMap<String,Integer> LejyonuKuran = new HashMap<String,Integer>();
+		public HashMap<String,String> LejyonuKuran = new HashMap<String,String>();
 		public HashMap<String,String> MOTD = new HashMap<String,String>();
+		public HashMap<String,Long> FaturaTarihi = new HashMap<String,Long>();
 	
 	//Oyuncular DBsi
 		public HashMap<String,String> OyuncuLejyonu = new HashMap<String,String>();
 		public HashMap<String,String> OyuncuRütbesi = new HashMap<String,String>();
-		public HashMap<String,Integer> OyuncuBildirimi = new HashMap<String,Integer>();
 	
 	public void bilgileriYukle() throws SQLException{
 		ToplamPuan.clear();
 		AylikPuan.clear();
 		LejyonSeviyesi.clear();
-		LejyonDurumu.clear();
 		LejyonuKuran.clear();
 		MOTD.clear();
 		
@@ -45,8 +46,8 @@ public class LejyonAPI {
 			ToplamPuan.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getInt("ToplamPuan"));
 			AylikPuan.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getInt("AylikPuan"));
 			LejyonSeviyesi.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getInt("LejyonSeviyesi"));
-			LejyonDurumu.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getInt("LejyonDurumu"));
-			LejyonuKuran.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getInt("LejyonuKuran"));
+			LejyonuKuran.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getString("LejyonuKuran"));
+			FaturaTarihi.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getLong("SonFaturaTarihi") * 1000);
 			if (lejyonlar.getString("MOTD") != null){
 				MOTD.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getString("MOTD"));
 			}
@@ -98,18 +99,7 @@ public class LejyonAPI {
 		BL.ra.mesajGönder(oyuncu, "Onaylamak için /lejyon kabul komutunu girin. Reddetmek için /lejyon ret komutunu girin.");
 		BL.ra.mesajGönder(oyuncu, "Lejyon davetini 1 dakika içinde onaylamazsanýz, otomatik olarak istek iptal olacak.");
 		
-		BL.rb.sendChannelMessage("BungeeLejyon", "LejyonisteðiGönder" + BL.split + oyuncu + BL.split + Lejyon);
-		
-		ProxyServer.getInstance().getScheduler().schedule(BL.instance,new Runnable(){
-	        @SuppressWarnings("deprecation")
-			public void run(){
-	        	if (BL.la.AktifLejyonTeklifleri.containsKey(oyuncu)){
-	        		BL.la.AktifLejyonTeklifleri.remove(oyuncu);
-	        		BL.ra.mesajGönder(oyuncu, "Lejyon isteðini cevaplamadýðýnýz için, otomatik olarak reddedilmiþtir.");
-	        		sender.sendMessage(oyuncu + " Lejyon isteðine cevap vermediði için, otomatik olarak reddedildi.");
-	        	}
-	        }
-	      } , 30, TimeUnit.SECONDS);		
+		BL.rb.sendChannelMessage("BungeeLejyon", "LejyonisteðiGönder" + BL.split + oyuncu + BL.split + Lejyon + BL.split + sender.getName());
 	}
 	
 	public boolean lejyonaSahipmi(String oyuncu){
@@ -117,6 +107,57 @@ public class LejyonAPI {
 			return true;
 		} else {
 			return false;
+		}
+	}
+	
+	
+	public boolean faturaTarihiYaklaþMýþmý(String lejyon){
+	    long simdi = new Date().getTime();
+		Date faturaTarihi = new Date();
+		faturaTarihi.setTime(FaturaTarihi.get(lejyon));
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(faturaTarihi);
+		
+		cal.set(Calendar.DAY_OF_MONTH, Calendar.DAY_OF_MONTH - 10);
+		
+		if (simdi < faturaTarihi.getTime()){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean faturaTarihiGeçmiþmi(String lejyon){
+	    long simdi = new Date().getTime();
+		long faturaTarihi = FaturaTarihi.get(lejyon);
+		
+		if (simdi < faturaTarihi){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean dahaFazlaAlabilirmi(String lejyon){
+		if (LejyonSeviyesi.get(lejyon) == 1 && cekLejyonOyunculari(lejyon).size() >= 16){
+			return false;
+		} else if (LejyonSeviyesi.get(lejyon) == 2 && cekLejyonOyunculari(lejyon).size() >= 20){
+			return false;
+		} else if (LejyonSeviyesi.get(lejyon) == 3 && cekLejyonOyunculari(lejyon).size() >= 28){
+			return false;
+		} else if (LejyonSeviyesi.get(lejyon) == 4 && cekLejyonOyunculari(lejyon).size() >= 40){
+			return false;
+		} else if (LejyonSeviyesi.get(lejyon) == 5 && cekLejyonOyunculari(lejyon).size() >= 60){
+			return false;
+		} else if (LejyonSeviyesi.get(lejyon) == 6 && cekLejyonOyunculari(lejyon).size() >= 90){
+			return false;
+		} else if (LejyonSeviyesi.get(lejyon) == 7 && cekLejyonOyunculari(lejyon).size() >= 150){
+			return false;
+		} else if (LejyonSeviyesi.get(lejyon) == 8 && cekLejyonOyunculari(lejyon).size() >= 250){
+			return false;
+		} else {
+			return true;
 		}
 	}
 	
@@ -133,6 +174,23 @@ public class LejyonAPI {
 				BL.ra.mesajGönder(lejyoner, oyuncu + " lejyondan atýldý.");
 			}
 		}
+	}
+	
+	public void lejyondanÇýk(String oyuncu,String Lejyon) throws SQLException{
+		BL.ms.statement.executeUpdate("DELETE FROM `Oyuncular` WHERE (`OyuncuAdi`='" + oyuncu + "');");
+		BL.rb.sendChannelMessage("BungeeLejyon", "LejyondanSil" + BL.split + oyuncu);
+		
+		ArrayList<String> lejyonOyuncuListesi = BL.la.cekLejyonOyunculari(Lejyon);
+		for (String lejyoner : lejyonOyuncuListesi){
+			if (BL.ra.EgerOnline(lejyoner) == true && !lejyoner.contains(oyuncu)){
+				BL.ra.mesajGönder(lejyoner, oyuncu + " lejyondan çýktý.");
+			}
+		}
+	}
+	
+	public void motdAta(String lejyon, String yeniMotd) throws SQLException{
+		BL.ms.statement.executeUpdate("UPDATE Lejyonlar SET MOTD='" + yeniMotd + "' WHERE LejyonAdi='" + lejyon +"'" );
+		BL.rb.sendChannelMessage("BungeeLejyon", "MotdAta" + BL.split + lejyon + BL.split + yeniMotd);
 	}
 
 }
