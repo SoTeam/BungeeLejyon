@@ -122,9 +122,9 @@ public class LejyonAPI {
 		cal.set(Calendar.DAY_OF_MONTH, Calendar.DAY_OF_MONTH - 10);
 		
 		if (simdi < faturaTarihi.getTime()){
-			return true;
-		} else {
 			return false;
+		} else {
+			return true;
 		}
 	}
 	
@@ -133,9 +133,9 @@ public class LejyonAPI {
 		long faturaTarihi = FaturaTarihi.get(lejyon);
 		
 		if (simdi < faturaTarihi){
-			return true;
-		} else {
 			return false;
+		} else {
+			return true;
 		}
 	}
 	
