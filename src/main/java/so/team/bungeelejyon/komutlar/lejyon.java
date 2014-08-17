@@ -84,7 +84,7 @@ public class lejyon extends Command{
 				for (int n = 1; n < args.length; n++){
 					sb.append(args[n] + " ");
 				}	
-				motdAta((ProxiedPlayer) sender, "Lejyon mesajı: " + sb.toString());
+				motdAta((ProxiedPlayer) sender, sb.toString());
 			} else if (args[0].toLowerCase().equalsIgnoreCase("geribildirim")){
 				StringBuilder sb = new StringBuilder();
 				for (int n = 1; n < args.length; n++){
@@ -127,7 +127,7 @@ public class lejyon extends Command{
     	sender.sendMessage("Lejyon Seviyesi: " + BL.la.LejyonSeviyesi.get(lejyon));
     	sender.sendMessage("Üye Sayısı: " + BL.la.cekLejyonOyunculari(lejyon).size());
     	if (BL.la.MOTD.get(lejyon) != null){
-    		sender.sendMessage("Lejyon Mesajı: " + BL.la.MOTD.get(lejyon));
+    		sender.sendMessage("Lejyon Mesajı: " + BL.la.MOTD.get(lejyon).replaceAll("&", "§"));
     	}
 	}
 
@@ -274,7 +274,7 @@ public class lejyon extends Command{
 		
 		try {
 			BL.la.motdAta(BL.la.cekOyuncuLejyonu(sender.getName()), yeniMotd);
-			sender.sendMessage(MY.normalMesaj("Yeni MOTD Atandı: " + yeniMotd));
+			sender.sendMessage(MY.normalMesaj("Yeni MOTD Atandı: " + yeniMotd.replaceAll("&", "§")));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}	
@@ -356,7 +356,7 @@ public class lejyon extends Command{
 			return;
 		}
 		
-		sender.sendMessage(MOTD);	
+		sender.sendMessage("Lejyon mesajı: " + MOTD.replaceAll("&", "§"));	
     }
     
     @SuppressWarnings("deprecation")
