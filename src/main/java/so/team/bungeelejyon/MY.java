@@ -6,13 +6,16 @@ import net.md_5.bungee.api.ChatColor;
 public class MY {
 
 	
-	//REDIS MESAJ
+	public static String iyiMesaj(String mesaj){
+		return BL.prefix + ChatColor.GREEN + mesaj;
+	}
+	
 	
 	public static String normalMesaj(String mesaj){
 		return BL.prefix + ChatColor.GOLD + mesaj;
 	}
 	
-	public static String hataMesajý(String mesaj){
+	public static String kötüMesaj(String mesaj){
 		return BL.prefix + ChatColor.RED + mesaj;
 	}
 	

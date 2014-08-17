@@ -117,10 +117,10 @@ public class BL extends Plugin implements Listener {
     	        	if (BL.la.AktifLejyonTeklifleri.containsKey(istekGönderilen)){
     	        		BL.la.AktifLejyonTeklifleri.remove(istekGönderilen);
     	        		if (getProxy().getPlayer(istekGönderilen) != null){
-    	        			getProxy().getPlayer(istekGönderilen).sendMessage(MY.normalMesaj("Lejyon isteğini cevaplamadığınız için, otomatik olarak reddedilmiştir."));
+    	        			getProxy().getPlayer(istekGönderilen).sendMessage(MY.normalMesaj("Lejyon isteğini cevaplamadığınız için otomatik olarak reddedilmiştir."));
     	            	}
     	        		if (getProxy().getPlayer(sender) != null){
-    	        			getProxy().getPlayer(sender).sendMessage(MY.normalMesaj(istekGönderilen + " Lejyon isteğine cevap vermediği için, otomatik olarak reddedildi."));
+    	        			getProxy().getPlayer(sender).sendMessage(MY.normalMesaj(istekGönderilen + " Lejyon isteğine cevap vermediği için otomatik olarak reddedildi."));
     	            	}
 
     	        	}

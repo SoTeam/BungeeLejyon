@@ -21,24 +21,24 @@ public class ServerDeðiþtiðinde implements Listener {
 				 String lejyonAdý = BL.la.OyuncuLejyonu.get(e.getPlayer().getName());
 				 if (BL.la.MOTD.containsKey(lejyonAdý)){
 					 String MOTD = BL.la.MOTD.get(lejyonAdý);
-					 e.getPlayer().sendMessage(BL.prefix + MOTD.replaceAll("&", "§"));
+					 e.getPlayer().sendMessage(BL.prefix + "§6Lejyon mesajý: §6" + MOTD.replaceAll("&", "§"));
 				 }
 				 if (BL.la.faturaTarihiGeçmiþmi(lejyonAdý) == true && BL.la.OyuncuRütbesi.get(e.getPlayer().getName()).equalsIgnoreCase("Tuðgeneral")){
 					 long faturaTarihi = BL.la.FaturaTarihi.get(lejyonAdý);
 				     SimpleDateFormat zamancevir = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 				     
-					 e.getPlayer().sendMessage(MY.hataMesajý("Lejyon harcýnýzýn son ödeme tarihi geçmiþtir."));
-					 e.getPlayer().sendMessage(MY.hataMesajý(zamancevir.format(faturaTarihi) + " tarihine kadar ödeme yapmazsanýz lejyonunuz tamamen kapatýlacaktýr."));
-					 e.getPlayer().sendMessage(MY.hataMesajý("Bu süre boyunca lejyonunuz kýsýtlý fonksiyonlar ile aktif kalacaktýr."));
+					 e.getPlayer().sendMessage(MY.kötüMesaj("Lejyon harcýnýzýn son ödeme tarihi geçmiþtir."));
+					 e.getPlayer().sendMessage(MY.kötüMesaj(zamancevir.format(faturaTarihi) + " tarihine kadar ödeme yapmazsanýz lejyonunuz tamamen kapatýlacaktýr."));
+					 e.getPlayer().sendMessage(MY.kötüMesaj("Bu süre boyunca lejyonunuz kýsýtlý fonksiyonlar ile aktif kalacaktýr."));
 					 return;
 				 }
 				 if (BL.la.faturaTarihiYaklaþMýþmý(lejyonAdý) == true && BL.la.OyuncuRütbesi.get(e.getPlayer().getName()).equalsIgnoreCase("Tuðgeneral")){
 					 long faturaTarihi = BL.la.FaturaTarihi.get(lejyonAdý);
 				     SimpleDateFormat zamancevir = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 				     
-					 e.getPlayer().sendMessage(MY.hataMesajý("Lejyon harcýnýzýn son ödeme tarihi yaklaþmýþtýr."));
-					 e.getPlayer().sendMessage(MY.hataMesajý(zamancevir.format(faturaTarihi) + " tarihine kadar ödeme yapmazsanýz gerekmektedir."));
-					 e.getPlayer().sendMessage(MY.hataMesajý("Bu süre boyunca lejyon harcýný ödemezseniz lejyonunuz kýsýtlanacaktýr."));
+					 e.getPlayer().sendMessage(MY.kötüMesaj("Lejyon harcýnýzýn son ödeme tarihi yaklaþmýþtýr."));
+					 e.getPlayer().sendMessage(MY.kötüMesaj(zamancevir.format(faturaTarihi) + " tarihine kadar ödeme yapmazsanýz gerekmektedir."));
+					 e.getPlayer().sendMessage(MY.kötüMesaj("Bu süre boyunca lejyon harcýný ödemezseniz lejyonunuz kýsýtlanacaktýr."));
 				 }
 			 }
 		 }
