@@ -3,6 +3,7 @@ package so.team.bungeelejyon.event;
 import java.util.ArrayList;
 
 import so.team.bungeelejyon.BL;
+import so.team.bungeelejyon.MY;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -25,7 +26,7 @@ public class OyunaGirdiðinde implements Listener {
 				 {
 					 if (BL.ra.EgerOnline(oyuncu) == true && !oyuncu.contains(e.getPlayer().getName()))
 					 {
-						 BL.ra.mesajGönder(oyuncu, e.getPlayer().getName() + " isimli lejyon üyesi oyuna giriþ yaptý.");
+						 BL.ra.mesajGönder(oyuncu, MY.normalMesaj("§e" + e.getPlayer().getName() + " §6isimli lejyon üyesi oyuna giriþ yaptý."));
 					 }
 				 }
 			 }

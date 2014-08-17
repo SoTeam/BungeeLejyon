@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import so.team.bungeelejyon.BL;
+import so.team.bungeelejyon.MY;
 
 public class LejyonAPI {
 	
@@ -84,20 +85,21 @@ public class LejyonAPI {
 	public void lejyonaEkle(String oyuncu,String Lejyon) throws SQLException{
 		BL.ms.statement.executeUpdate("INSERT INTO Oyuncular (`OyuncuAdi`,`Lejyon`,`Rutbe`) VALUES ('" + oyuncu + "','" + Lejyon + "','Lejyoner');");
 		BL.rb.sendChannelMessage("BungeeLejyon", "LejyonaEkle" + BL.split + oyuncu + BL.split + Lejyon);
-		BL.ra.mesajGönder(oyuncu, Lejyon + " Lejyonuna katýldýn.");
+		BL.ra.mesajGönder(oyuncu, MY.iyiMesaj(Lejyon + " lejyonuna katýldýn. Kullanabileceðin lejyon komutlarý için /lejyon yaz."));
 		
 		ArrayList<String> lejyonOyuncuListesi = BL.la.cekLejyonOyunculari(Lejyon);
 		for (String lejyoner : lejyonOyuncuListesi){
 			if (BL.ra.EgerOnline(lejyoner) == true && !lejyoner.contains(oyuncu)){
-				BL.ra.mesajGönder(lejyoner, oyuncu + " lejyona katýldý.");
+				BL.ra.mesajGönder(lejyoner, MY.normalMesaj(oyuncu + " lejyona katýldý."));
 			}
 		}
 	}
 	
 	public void lejyonisteðiGönder(final String oyuncu,String Lejyon,final ProxiedPlayer sender){
-		BL.ra.mesajGönder(oyuncu, Lejyon + " isimli lejyona davet edildiniz.");
-		BL.ra.mesajGönder(oyuncu, "Onaylamak için /lejyon kabul komutunu girin. Reddetmek için /lejyon ret komutunu girin.");
-		BL.ra.mesajGönder(oyuncu, "Lejyon davetini 1 dakika içinde onaylamazsanýz, otomatik olarak istek iptal olacak.");
+		BL.ra.mesajGönder(oyuncu, MY.normalMesaj(sender.getName() + " tarafýndan §e" + Lejyon + " §6isimli lejyona davet edildin."));
+		BL.ra.mesajGönder(oyuncu, MY.normalMesaj("Daveti onaylamak için §a/lejyon kabul §6komutunu girin."));
+		BL.ra.mesajGönder(oyuncu, MY.normalMesaj("Reddetmek için ise §c/lejyon ret §6komutunu girin."));
+		BL.ra.mesajGönder(oyuncu, MY.normalMesaj("Lejyon davetininin geçerlilik süresi 1 dakikadýr."));
 		
 		BL.rb.sendChannelMessage("BungeeLejyon", "LejyonisteðiGönder" + BL.split + oyuncu + BL.split + Lejyon + BL.split + sender.getName());
 	}
@@ -165,13 +167,13 @@ public class LejyonAPI {
 		BL.ms.statement.executeUpdate("DELETE FROM `Oyuncular` WHERE (`OyuncuAdi`='" + oyuncu + "');");
 		BL.rb.sendChannelMessage("BungeeLejyon", "LejyondanSil" + BL.split + oyuncu);
 		if (BL.ra.EgerOnline(oyuncu)){
-			BL.ra.mesajGönder(oyuncu, Lejyon + " lejyonundan atýldýn.");
+			BL.ra.mesajGönder(oyuncu, MY.kötüMesaj(Lejyon + " lejyonundan atýldýnýz."));
 		}
 		
 		ArrayList<String> lejyonOyuncuListesi = BL.la.cekLejyonOyunculari(Lejyon);
 		for (String lejyoner : lejyonOyuncuListesi){
 			if (BL.ra.EgerOnline(lejyoner) == true && !lejyoner.contains(oyuncu)){
-				BL.ra.mesajGönder(lejyoner, oyuncu + " lejyondan atýldý.");
+				BL.ra.mesajGönder(lejyoner, MY.kötüMesaj(oyuncu + " lejyondan atýldý."));
 			}
 		}
 	}
@@ -183,7 +185,7 @@ public class LejyonAPI {
 		ArrayList<String> lejyonOyuncuListesi = BL.la.cekLejyonOyunculari(Lejyon);
 		for (String lejyoner : lejyonOyuncuListesi){
 			if (BL.ra.EgerOnline(lejyoner) == true && !lejyoner.contains(oyuncu)){
-				BL.ra.mesajGönder(lejyoner, oyuncu + " lejyondan çýktý.");
+				BL.ra.mesajGönder(lejyoner, MY.kötüMesaj(oyuncu + " lejyondan çýktý."));
 			}
 		}
 	}
