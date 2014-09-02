@@ -3,8 +3,12 @@ package so.team.bungeelejyon;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import com.imaginarycode.minecraft.redisbungee.RedisBungeeAPI;
 import com.imaginarycode.minecraft.redisbungee.events.PubSubMessageEvent;
@@ -20,6 +24,8 @@ import so.team.bungeelejyon.komutlar.lejyon;
 import so.team.bungeelejyon.metotlar.MetotÇalıştır;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
@@ -83,7 +89,8 @@ public class BL extends Plugin implements Listener {
 	    ProxyServer.getInstance().getPluginManager().registerCommand(this, new l(this));
 	    ProxyServer.getInstance().getPluginManager().registerCommand(this, new lejyon(this));
 	    rb.registerPubSubChannels("BungeeLejyon");
-	    
+	    getProxy().registerChannel("BungeeLejyon");
+	    m.mysqlDöngüsü();
     }
     
     @SuppressWarnings("deprecation")
@@ -152,8 +159,72 @@ public class BL extends Plugin implements Listener {
     		if (getProxy().getPlayer(davetEden) != null){
     			getProxy().getPlayer(davetEden).sendMessage(MY.normalMesaj(reddeden + " isimli oyuncu lejyon davetinizi reddetti."));
         	}
+        } else if (mesaj[0].equalsIgnoreCase("VerileriYenile")) {
+        	try {
+				la.bilgileriYukle();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
         }
       }
+    }
+    
+    @SuppressWarnings("deprecation")
+	@EventHandler
+    public void onPluginMessage(PluginMessageEvent event) {
+        if (event.getTag().equals("BungeeLejyon") && event.getSender() instanceof Server) {
+            final byte[] data = Arrays.copyOf(event.getData(), event.getData().length);
+            ByteArrayDataInput in = ByteStreams.newDataInput(data);
+
+            String subchannel = in.readUTF();
+            ByteArrayDataOutput out = ByteStreams.newDataOutput();
+
+            if (subchannel.equalsIgnoreCase("LejyonuCek")){
+	            out.writeUTF("LejyonuCek");
+	            String oyuncu = in.readUTF();
+	            out.writeUTF(oyuncu);
+	            if (la.lejyonaSahipmi(oyuncu) == true){
+		            out.writeUTF(la.cekOyuncuLejyonu(oyuncu));
+	            } else {
+	            	out.writeUTF("Yok");
+	            }
+	            
+	            ((Server)event.getSender()).sendData("BungeeLejyon", out.toByteArray());
+            } else if (subchannel.equalsIgnoreCase("RütbeCek")){
+	            out.writeUTF("RütbeCek");
+	            String oyuncu = in.readUTF();
+	            out.writeUTF(oyuncu);
+	            if (la.lejyonaSahipmi(oyuncu) == true){
+		            out.writeUTF(la.OyuncuRütbesi.get(oyuncu));
+	            } else {
+	            	out.writeUTF("Yok");
+	            }
+	            
+	            ((Server)event.getSender()).sendData("BungeeLejyon", out.toByteArray());
+            } else if (subchannel.equalsIgnoreCase("YeniLejyon")){
+	            out.writeUTF("YeniLejyon");
+	            String oyuncu = in.readUTF();
+	            String lejyonAdı = in.readUTF();
+	            
+	            if (la.lejyonVarmı(lejyonAdı) == false){
+	            	la.yeniLejyon(oyuncu, lejyonAdı);
+	            } else {
+	        		if (getProxy().getPlayer(oyuncu) != null){
+	        			getProxy().getPlayer(oyuncu).sendMessage(MY.kötüMesaj(lejyonAdı + " ismi zaten kullanılıyor."));
+	            	}
+	            }
+            } else if (subchannel.equalsIgnoreCase("LejyonSeviyesiniCek")){
+	            out.writeUTF("LejyonSeviyesiniCek");
+	            String oyuncu = in.readUTF();
+	            
+	            if (la.lejyonaSahipmi(oyuncu) == true){
+		            out.writeUTF(la.cekOyuncuLejyonu(oyuncu));
+		            out.writeInt(la.LejyonSeviyesi.get(la.cekOyuncuLejyonu(oyuncu)));
+	            }
+	            
+	            ((Server)event.getSender()).sendData("BungeeLejyon", out.toByteArray());
+            }
+        }
     }
     
 }

@@ -7,6 +7,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
+
+import net.md_5.bungee.api.ProxyServer;
+import so.team.bungeelejyon.BL;
 
 public class MetotÇalýþtýr {
 	
@@ -31,6 +35,22 @@ public class MetotÇalýþtýr {
 				);
 
 		return sortedEntries;
-}
+	}
+	
+	public void mysqlDöngüsü(){
+		ProxyServer.getInstance().getScheduler().schedule(BL.instance,new Runnable(){
+			public void run(){
+				try {
+					if (BL.ms.statement.isClosed()){
+						BL.ms.mysqlBaslangic();
+					}
+					seviyeleriGüncelle();
+					System.out.println("Mysql kontrolü yapýldý.");
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+	        }
+	      } ,100, 1000 * 60 * 10, TimeUnit.MICROSECONDS);	
+	}
 
 }

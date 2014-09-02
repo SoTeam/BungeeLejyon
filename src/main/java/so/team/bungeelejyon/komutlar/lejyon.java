@@ -3,15 +3,11 @@ package so.team.bungeelejyon.komutlar;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Map.Entry;
-
 import so.team.bungeelejyon.BL;
 import so.team.bungeelejyon.MY;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
@@ -73,12 +69,11 @@ public class lejyon extends Command{
 				tasfiye((ProxiedPlayer) sender, args[1]);
 			} else if (args[0].toLowerCase().equalsIgnoreCase("yarat")){
 				if (sender.hasPermission("bungeeplus.aktar")){
-					lejyonyarat((ProxiedPlayer) sender, args[1]);
+					BL.la.yeniLejyon(sender.getName(), args[1]);
 				}
 			} else if (args[0].toLowerCase().equalsIgnoreCase("ver")){
 				if (sender.hasPermission("bungeeplus.alert")){
-					ProxiedPlayer p = ProxyServer.getInstance().getPlayer(args[0]);
-					lejyonyarat(p, args[1]);
+					BL.la.yeniLejyon(args[0], args[1]);
 				}
 			} else if (args[0].toLowerCase().equalsIgnoreCase("bilgi")){
 				if (BL.la.LejyonSeviyesi.get(args[1]) != null){
@@ -104,24 +99,6 @@ public class lejyon extends Command{
 			}
 		}
     }
-    
-    @SuppressWarnings("deprecation")
-	private void lejyonyarat(ProxiedPlayer sender, String lejyonAdı) {
-	    Date simdi = new Date();
-
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(simdi);
-		
-		cal.add(Calendar.DAY_OF_MONTH, 90);
-		try {
-			BL.ms.statement.executeUpdate("INSERT INTO Lejyonlar (`LejyonAdi`,`SonFaturaTarihi`,`ToplamPuan`,`AylikPuan`,`LejyonSeviyesi`,`LejyonuKuran`) VALUES ('" + lejyonAdı + "','" + cal.getTime().getTime() / 1000 + "','0','0','0','" + sender.getName() + "');");
-			BL.ms.statement.executeUpdate("INSERT INTO Oyuncular (`OyuncuAdi`,`Lejyon`,`Rutbe`) VALUES ('" + sender.getName() + "','" + lejyonAdı + "','Tuğgeneral');");
-			sender.sendMessage(MY.iyiMesaj(ChatColor.DARK_GREEN + lejyonAdı + ChatColor.GREEN + " adlı lejyonun oluşturuldu."));
-			sender.sendMessage(MY.iyiMesaj("Kullanabileceğin lejyon komutları için /lejyon yaz."));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
 
 	@SuppressWarnings("deprecation")
 	private void bilgi(ProxiedPlayer sender, String lejyon) {
@@ -263,8 +240,12 @@ public class lejyon extends Command{
 		int i = 1;
 		sender.sendMessage("§c§k|||| §aSonOyuncu Lejyon Top 10 §c§k||||");
 		for (Entry<String, Integer> entry : BL.m.entriesSortedByValues(BL.la.ToplamPuan)){
-			sender.sendMessage(""+ChatColor.GOLD + ChatColor.BOLD + i + " - " + ChatColor.YELLOW + entry.getKey() + ChatColor.GOLD + ChatColor.BOLD + " || " + ChatColor.YELLOW +  entry.getValue());
-			i++;
+			if (i < 11){
+				sender.sendMessage(""+ChatColor.GOLD + ChatColor.BOLD + i + " - " + ChatColor.YELLOW + entry.getKey() + ChatColor.GOLD + ChatColor.BOLD + " || " + ChatColor.YELLOW +  entry.getValue());
+				i++;
+			} else {
+				break;
+			}
 		}
 		sender.sendMessage("§7§o30 dakikada bir yenilenir.");
 		sender.sendMessage("§c§k|||| §aSonOyuncu Lejyon Top 10 §c§k||||");
@@ -416,6 +397,7 @@ public class lejyon extends Command{
     		sender.sendMessage("§6/lejyon top10 §f- §eEn iyi 10 lejyonu gösterir.");
     		sender.sendMessage("§6/lejyon bilgi <LejyonAdı> §f- §eBelirtilen lejyonun bilgilerini gösterir.");
     	} else {
+    		sender.sendMessage("§6/l <mesaj> §f- §eLejyon arası konuşmanızı sağlar.");
     		sender.sendMessage("§6/lejyon motd §f- §eLejyon mesajını gösterir.");
     		sender.sendMessage("§6/lejyon top10 §f- §eEn iyi 10 lejyonu gösterir.");
     		sender.sendMessage("§6/lejyon üyeler §f- §eLejyon üyelerini gösterir.");

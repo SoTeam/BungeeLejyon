@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import so.team.bungeelejyon.BL;
@@ -20,6 +21,7 @@ public class LejyonAPI {
 	public HashMap<String,ScheduledTask> LejyonTeklifTasklari = new HashMap<String,ScheduledTask>();
 	
 	//Lejyonlar DBsi
+		public ArrayList<String> LejyonAdý = new ArrayList<String>();
 		public HashMap<String,Integer> ToplamPuan = new HashMap<String,Integer>();
 		public HashMap<String,Integer> AylikPuan = new HashMap<String,Integer>();
 		public HashMap<String,Integer> LejyonSeviyesi = new HashMap<String,Integer>();
@@ -32,11 +34,13 @@ public class LejyonAPI {
 		public HashMap<String,String> OyuncuRütbesi = new HashMap<String,String>();
 	
 	public void bilgileriYukle() throws SQLException{
+		LejyonAdý.clear();
 		ToplamPuan.clear();
 		AylikPuan.clear();
 		LejyonSeviyesi.clear();
 		LejyonuKuran.clear();
 		MOTD.clear();
+		FaturaTarihi.clear();
 		
 		OyuncuLejyonu.clear();
 		OyuncuRütbesi.clear();
@@ -44,6 +48,7 @@ public class LejyonAPI {
 		ResultSet lejyonlar = BL.ms.statement.executeQuery("SELECT * FROM Lejyonlar;");
 		
 		while (lejyonlar.next()){
+			LejyonAdý.add(lejyonlar.getString("LejyonAdý").toLowerCase());
 			ToplamPuan.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getInt("ToplamPuan"));
 			AylikPuan.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getInt("AylikPuan"));
 			LejyonSeviyesi.put(lejyonlar.getString("LejyonAdý"), lejyonlar.getInt("LejyonSeviyesi"));
@@ -194,5 +199,33 @@ public class LejyonAPI {
 		BL.ms.statement.executeUpdate("UPDATE Lejyonlar SET MOTD='" + yeniMotd + "' WHERE LejyonAdi='" + lejyon +"'" );
 		BL.rb.sendChannelMessage("BungeeLejyon", "MotdAta" + BL.split + lejyon + BL.split + yeniMotd);
 	}
+	
+	public void yeniLejyon(String lejyonuKuran, String lejyonAdý) {
+	    Date simdi = new Date();
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(simdi);
+		
+		cal.add(Calendar.DAY_OF_MONTH, 90);
+		try {
+			BL.ms.statement.executeUpdate("INSERT INTO Lejyonlar (`LejyonAdi`,`SonFaturaTarihi`,`ToplamPuan`,`AylikPuan`,`LejyonSeviyesi`,`LejyonuKuran`) VALUES ('" + lejyonAdý + "','" + cal.getTime().getTime() / 1000 + "','0','0','0','" + lejyonuKuran + "');");
+			BL.ms.statement.executeUpdate("INSERT INTO Oyuncular (`OyuncuAdi`,`Lejyon`,`Rutbe`) VALUES ('" + lejyonuKuran + "','" + lejyonAdý + "','Tuðgeneral');");
+			BL.ra.mesajGönder(lejyonuKuran, MY.iyiMesaj(ChatColor.DARK_GREEN + lejyonAdý + ChatColor.GREEN + " adlý lejyonun oluþturuldu."));
+			BL.ra.mesajGönder(lejyonuKuran, MY.iyiMesaj("Kullanabileceðin lejyon komutlarý için /lejyon yaz."));
+			BL.ra.lejyonVerileriniYenile();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
+	public boolean lejyonVarmý(String yeniLejyon){
+		if (LejyonAdý.contains(yeniLejyon.toLowerCase())){
+			return true;
+		} else {
+			return false;
+		}
+	}	
 
 }
